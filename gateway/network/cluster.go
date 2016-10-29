@@ -23,6 +23,8 @@ func InitCluster(name string) {
 	_cluster = new(Cluster)
 	_cluster.Name = name
 	_cluster.Map = radixTree{_map}
+	_cluster.Services = Services{}
+	_cluster.Nodes = Nodes{}
 }
 
 func GetCluster() *Cluster {

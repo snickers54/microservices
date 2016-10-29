@@ -4,22 +4,21 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/network"
 )
 
-func clusterDescribe(context *AppContext) {
-	context.WriteJSON(network.GetCluster())
-	context.Done()
+func clusterDescribe(c *context.AppContext) {
+	c.WriteJSON(network.GetCluster())
 }
 
-func clusterRegister(context *AppContext) {
+func clusterRegister(c *context.AppContext) {
 	node := network.Node{}
-	context.BindJSON(&node)
+	c.BindJSON(&node)
 	node.Status = network.STATUS_ACTIVE
 	if ok := network.GetCluster().Nodes.Add(node); ok == false {
-		context.Error(errors.New("This node already exists."), http.StatusConflict)
+		c.Error(errors.New("This node already exists."), http.StatusConflict)
 		return
 	}
-	context.WriteJSON(node)
-	context.Done()
+	c.WriteJSON(node)
 }

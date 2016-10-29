@@ -18,11 +18,11 @@ func ToMap() map[string]interface{}                  { return _map.ToMap() }
 
 func RemoveInstance(service *Service) {
 	_map.Walk(func(s string, v interface{}) bool {
-		currentEndpoint := v.(*endpoint)
-		for key, instance := range currentEndpoint.RouteInstances {
+		currentRoute := v.(*Route)
+		for key, instance := range currentRoute.Endpoints {
 			if instance.Service.String() == service.String() {
-				currentEndpoint.RouteInstances[key] = currentEndpoint.RouteInstances[len(currentEndpoint.RouteInstances)-1]
-				currentEndpoint.RouteInstances = currentEndpoint.RouteInstances[:len(currentEndpoint.RouteInstances)-1]
+				currentRoute.Endpoints[key] = currentRoute.Endpoints[len(currentRoute.Endpoints)-1]
+				currentRoute.Endpoints = currentRoute.Endpoints[:len(currentRoute.Endpoints)-1]
 				break
 			}
 		}
@@ -30,17 +30,26 @@ func RemoveInstance(service *Service) {
 	})
 }
 
-func InsertRoute(route string, service *Service) bool {
-	_, ok := _map.Get(route)
+func GetRoute(path string) *Route {
+	rawRoute, ok := _map.Get(path)
 	if ok == false {
-		_map.Insert(route, new(endpoint))
+		return nil
 	}
-	rawEndpoint, ok := _map.Get(route)
-	endpoint := rawEndpoint.(*endpoint)
-	if endpoint.RouteInstances.Exists(service) == false {
-		endpoint.RouteInstances = append(endpoint.RouteInstances, routeInstance{
+	return rawRoute.(*Route)
+}
+
+func InsertEndpoint(path string, service *Service) bool {
+	_, ok := _map.Get(path)
+	if ok == false {
+		_map.Insert(path, new(Route))
+	}
+	rawRoute, ok := _map.Get(path)
+	route := rawRoute.(*Route)
+	if route.Endpoints.Exists(service) == false {
+		route.Endpoints = append(route.Endpoints, &Endpoint{
 			Service: service,
 			Status:  STATUS_ACTIVE,
+			Retries: 0,
 		})
 		log.Println("Registered route : ", route, " from ", service.String())
 		return true

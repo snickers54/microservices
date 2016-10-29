@@ -21,13 +21,8 @@ func main() {
 	}
 	InitConfig(os.Args[1])
 	network.InitCluster(viper.GetString("cluster.name"))
-	network.InsertRoute("test", &network.Service{})
+	network.InsertEndpoint("test", &network.Service{})
 	handlers.Start()
-}
-
-func printMap(objects map[string]interface{}) {
-	for key, obj := range objects {
-		fmt.Println(key, obj)
-	}
-	fmt.Println("----------")
+	version := network.Version{}
+	version.Parse("-wfsdghs best1.3.2ever dsgfhs-")
 }
