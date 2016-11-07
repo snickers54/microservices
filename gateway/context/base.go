@@ -32,6 +32,7 @@ func (self *AppContext) WriteJSON(value interface{}) {
 		return
 	}
 	self.Writer.Header().Set("Content-Type", "application/json")
+	self.Writer.WriteHeader(http.StatusOK)
 	self.Writer.Write(result)
 }
 

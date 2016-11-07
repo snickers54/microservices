@@ -6,7 +6,6 @@ import (
 
 	"github.com/snickers54/microservices/gateway/handlers"
 	"github.com/snickers54/microservices/gateway/network"
-	"github.com/spf13/viper"
 )
 
 var usage = func() {
@@ -20,9 +19,6 @@ func main() {
 		usage()
 	}
 	InitConfig(os.Args[1])
-	network.InitCluster(viper.GetString("cluster.name"))
-	network.InsertEndpoint("test", &network.Service{})
+	network.InitCluster()
 	handlers.Start()
-	version := network.Version{}
-	version.Parse("-wfsdghs best1.3.2ever dsgfhs-")
 }

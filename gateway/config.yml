@@ -1,2 +1,5 @@
 cluster:
+  name: "alpha"
+node:
   name: "Legend"
+  port: 8000

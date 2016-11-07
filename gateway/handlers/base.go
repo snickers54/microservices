@@ -7,27 +7,28 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/middlewares"
+	"github.com/spf13/viper"
 )
 
 func statsHandlers(router *mux.Router) {
-	subRouter := router.PathPrefix("/stats").Subrouter()
-	GET(subRouter, "/", statsSummarize)
+	subRouter := NewGSubRouter(router.PathPrefix("/stats").Subrouter())
+	subRouter.GET("/", statsSummarize)
 }
 
 func gatewaysHandlers(router *mux.Router) {
-	subRouter := router.PathPrefix("/cluster").Subrouter()
-	GET(subRouter, "/", clusterDescribe)
-	POST(subRouter, "/nodes", clusterRegister, middlewares.Sync, middlewares.CloseBody)
+	subRouter := NewGSubRouter(router.PathPrefix("/cluster").Subrouter())
+	subRouter.GET("/", clusterDescribe)
+	subRouter.POST("/nodes", clusterRegister, middlewares.Sync, middlewares.CloseBody)
 }
 
 func servicesHandlers(router *mux.Router) {
-	subRouter := router.PathPrefix("/services").Subrouter()
-	GET(subRouter, "/", servicesDescribe)
-	POST(subRouter, "/", servicesRegister, middlewares.Sync, middlewares.CloseBody)
+	subRouter := NewGSubRouter(router.PathPrefix("/services").Subrouter())
+	subRouter.GET("/", servicesDescribe)
+	subRouter.POST("/", middlewares.Sync, middlewares.CloseBody, servicesRegister)
 }
 
 func dispatchHandlers(router *mux.Router) {
-	subRouter := router.PathPrefix("/api").Subrouter()
+	subRouter := NewGSubRouter(router.PathPrefix("/api").Subrouter())
 	patternDispatch := "/{path:.*}"
 	replayMiddlewares := []context.AppHandler{
 		dispatchToService,
@@ -35,10 +36,10 @@ func dispatchHandlers(router *mux.Router) {
 		middlewares.CloseBody,
 		middlewares.StatsReplay,
 	}
-	GET(subRouter, patternDispatch, replayMiddlewares...)
-	POST(subRouter, patternDispatch, replayMiddlewares...)
-	PUT(subRouter, patternDispatch, replayMiddlewares...)
-	DELETE(subRouter, patternDispatch, replayMiddlewares...)
+	subRouter.GET(patternDispatch, replayMiddlewares...)
+	subRouter.POST(patternDispatch, replayMiddlewares...)
+	subRouter.PUT(patternDispatch, replayMiddlewares...)
+	subRouter.DELETE(patternDispatch, replayMiddlewares...)
 }
 
 func Start() {
@@ -47,5 +48,5 @@ func Start() {
 	gatewaysHandlers(router)
 	servicesHandlers(router)
 	dispatchHandlers(router)
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":"+viper.GetString("cluster.port"), router))
 }

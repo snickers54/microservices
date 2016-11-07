@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"net/http"
 	"strings"
 	"sync"
 
@@ -10,22 +9,14 @@ import (
 )
 
 func Sync(c *context.AppContext) {
-	// if it's coming from a gateway we have to identify gateway that were not notified..
 	nodes := network.GetCluster().Nodes
 	gatewaysToReplay := network.Nodes{}
 	notified := c.Request.Header.Get("gateway-notified")
-	if isGateway(nodes, c.Request) {
-		for _, gateway := range strings.Split(notified, ",") {
-			tempNode := network.Node{}
-			tempNode.UpdateFromAddr(gateway)
-			if nodes.Exists(tempNode) == false {
-				gatewaysToReplay = append(gatewaysToReplay, tempNode)
-			}
-		}
-	} else {
-		gatewaysToReplay = network.GetCluster().Nodes
+	if len(notified) == 0 {
+		gatewaysToReplay = nodes
 	}
-
+	gatewaysToReplay = gatewaysNotFoundInNotified(notified, nodes)
+	gatewaysToReplay = excludeMyself(gatewaysToReplay)
 	for _, node := range gatewaysToReplay {
 		notified = notified + "," + node.IP + ":" + node.Port
 	}
@@ -39,8 +30,24 @@ func Sync(c *context.AppContext) {
 	c.Next()
 }
 
-func isGateway(nodes network.Nodes, r *http.Request) bool {
-	node := network.Node{}
-	node.UpdateFromAddr(r.RemoteAddr)
-	return nodes.Exists(node)
+func excludeMyself(gateways network.Nodes) network.Nodes {
+	gatewaysToReplay := network.Nodes{}
+	for _, gateway := range gateways {
+		if gateway.Myself == false {
+			gatewaysToReplay = append(gatewaysToReplay, gateway)
+		}
+	}
+	return gatewaysToReplay
+}
+
+func gatewaysNotFoundInNotified(notified string, nodes network.Nodes) network.Nodes {
+	gatewaysToReplay := network.Nodes{}
+	for _, gateway := range strings.Split(notified, ",") {
+		tempNode := network.Node{}
+		tempNode.UpdateFromAddr(gateway)
+		if nodes.Exists(tempNode) == false {
+			gatewaysToReplay = append(gatewaysToReplay, tempNode)
+		}
+	}
+	return gatewaysToReplay
 }

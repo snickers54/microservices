@@ -1,0 +1,8 @@
+node:
+  name: "Legend"
+  port: 8001
+cluster:
+  name: "alpha"
+  master:
+    ip: "127.0.0.1"
+    port: 8000

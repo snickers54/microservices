@@ -7,10 +7,10 @@ import (
 )
 
 type Cluster struct {
-	Name     string    `json:"name"`
 	Nodes    Nodes     `json:"nodes"`
 	Services Services  `json:"services"`
 	Map      radixTree `json:"map"`
+	Name     string    `json:"name"`
 }
 
 func (self *Cluster) String() string {
@@ -19,17 +19,26 @@ func (self *Cluster) String() string {
 
 var _cluster *Cluster
 
-func InitCluster(name string) {
+func InitCluster() {
 	_cluster = new(Cluster)
-	_cluster.Name = name
 	_cluster.Map = radixTree{_map}
 	_cluster.Services = Services{}
 	_cluster.Nodes = Nodes{}
+	node := Node{
+		Name:   viper.GetString("node.name"),
+		Port:   viper.GetString("node.port"),
+		Status: STATUS_ACTIVE,
+		IP:     "localhost",
+		Myself: true,
+	}
+	go node.Start()
+	_cluster.Nodes.Add(node)
+	_cluster.Name = "Singlette Gateway Cluster prototype"
 }
 
 func GetCluster() *Cluster {
 	if _cluster == nil {
-		InitCluster(viper.GetString("cluster.name"))
+		InitCluster()
 	}
 	return _cluster
 }
