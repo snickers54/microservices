@@ -4,7 +4,6 @@ import "fmt"
 
 type Service struct {
 	Name    string  `json:"name"`
-	DNS     string  `json:"dns_name"`
 	IP      string  `json:"ip"`
 	Port    string  `json:"port"`
 	Version Version `json:"version"`
@@ -17,7 +16,7 @@ func (self Services) Swap(i, j int)      { self[i], self[j] = self[j], self[i] }
 func (self Services) Less(i, j int) bool { return self[i].Name < self[j].Name }
 
 func (self *Service) String() string {
-	return fmt.Sprintf("%s - %s | %s(%s:%s)", self.Name, self.Version.String(), self.DNS, self.IP, self.Port)
+	return fmt.Sprintf("%s - %s | %s:%s", self.Name, self.Version.String(), self.IP, self.Port)
 }
 
 func (self *Services) Add(service Service) bool {

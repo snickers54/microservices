@@ -29,7 +29,7 @@ func (self *Version) Parse(str string) {
 		self.Minor, _ = strconv.ParseUint(list[1], 10, 64)
 		self.Patch, _ = strconv.ParseUint(list[2], 10, 64)
 	}
-	self.Name = strings.Replace(str, pureString, "", -1)
+	self.Name = strings.Replace(str, " ("+pureString+")", "", -1)
 	log.Println("Result : ", self)
 }
 
