@@ -36,16 +36,17 @@ func (self *AppContext) WriteJSON(value interface{}) {
 	self.Writer.Write(result)
 }
 
-func (self *AppContext) BindJSON(value interface{}) {
+func (self *AppContext) BindJSON(value interface{}) bool {
 	if self.Request.Body == nil {
 		self.Error(errors.New("Please send a request body"), http.StatusBadRequest)
-		return
+		return false
 	}
 	err := json.NewDecoder(self.Request.Body).Decode(&value)
 	if err != nil {
 		self.Error(err, http.StatusBadRequest)
-		return
+		return false
 	}
+	return true
 }
 
 func (self *AppContext) Error(err error, code int) {
@@ -87,6 +88,7 @@ func ExtractIpPort(value string) (ip string, port string, err error) {
 	tuple := strings.Split(value, ":")
 	if len(tuple) != 2 {
 		err = errors.New("Addr doesn't seems valid, can't extract IP and Port")
+		return "", "", err
 	}
 	return tuple[0], tuple[1], err
 }

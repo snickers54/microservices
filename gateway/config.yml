@@ -1,5 +1,7 @@
 cluster:
   name: "alpha"
+  ping:
+    interval: "10s"
 node:
   name: "Legend"
   port: 8000

@@ -15,7 +15,9 @@ func clusterDescribe(c *context.AppContext) {
 
 func clusterRegister(c *context.AppContext) {
 	node := network.Node{}
-	c.BindJSON(&node)
+	if ok := c.BindJSON(&node); !ok {
+		return
+	}
 	node.Status = network.STATUS_ACTIVE
 	node.IP = strings.Split(c.Request.RemoteAddr, ":")[0]
 	if ok := network.GetCluster().Nodes.Add(node); ok == false {

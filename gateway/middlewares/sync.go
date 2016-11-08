@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"log"
 	"strings"
 	"sync"
 
@@ -14,9 +15,11 @@ func Sync(c *context.AppContext) {
 	notified := c.Request.Header.Get("gateway-notified")
 	if len(notified) == 0 {
 		gatewaysToReplay = nodes
+	} else {
+		gatewaysToReplay = gatewaysNotFoundInNotified(notified, nodes)
 	}
-	gatewaysToReplay = gatewaysNotFoundInNotified(notified, nodes)
 	gatewaysToReplay = excludeMyself(gatewaysToReplay)
+	log.Println(gatewaysToReplay)
 	for _, node := range gatewaysToReplay {
 		notified = notified + "," + node.IP + ":" + node.Port
 	}

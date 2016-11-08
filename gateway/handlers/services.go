@@ -14,7 +14,9 @@ func servicesDescribe(c *context.AppContext) {
 
 func servicesRegister(c *context.AppContext) {
 	service := network.Service{}
-	c.BindJSON(&service)
+	if ok := c.BindJSON(&service); !ok {
+		return
+	}
 	service.Status = network.STATUS_ACTIVE
 	if ok := network.GetCluster().Services.Add(service); ok == false {
 		c.Error(errors.New("This node already exists."), http.StatusConflict)

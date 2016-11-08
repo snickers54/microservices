@@ -15,16 +15,16 @@ func statsHandlers(router *mux.Router) {
 	subRouter.GET("/", statsSummarize)
 }
 
-func gatewaysHandlers(router *mux.Router) {
+func clusterHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/cluster").Subrouter())
 	subRouter.GET("/", clusterDescribe)
-	subRouter.POST("/nodes", clusterRegister, middlewares.Sync, middlewares.CloseBody)
+	subRouter.POST("/nodes", middlewares.Sync, middlewares.CloseBody, clusterRegister)
 }
 
 func servicesHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/services").Subrouter())
 	subRouter.GET("/", servicesDescribe)
-	subRouter.POST("/", middlewares.Sync, middlewares.CloseBody, servicesRegister)
+	subRouter.POST("/", servicesRegister, middlewares.Sync, middlewares.CloseBody)
 }
 
 func dispatchHandlers(router *mux.Router) {
@@ -42,11 +42,17 @@ func dispatchHandlers(router *mux.Router) {
 	subRouter.DELETE(patternDispatch, replayMiddlewares...)
 }
 
+func baseHandlers(router *mux.Router) {
+	subRouter := NewGSubRouter(router.PathPrefix("/").Subrouter())
+	subRouter.GET("/healthcheck", nodePing)
+}
+
 func Start() {
 	router := mux.NewRouter()
+	baseHandlers(router)
 	statsHandlers(router)
-	gatewaysHandlers(router)
+	clusterHandlers(router)
 	servicesHandlers(router)
 	dispatchHandlers(router)
-	log.Fatal(http.ListenAndServe(":"+viper.GetString("cluster.port"), router))
+	log.Fatal(http.ListenAndServe(":"+viper.GetString("node.port"), router))
 }

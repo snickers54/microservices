@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -27,6 +28,7 @@ func (self *Node) String() string {
 }
 
 func (self *Node) UpdateFromAddr(remoteAddr string) {
+	log.Println("Update node from remoteAddr : ", remoteAddr)
 	var err error
 	self.IP, self.Port, err = context.ExtractIpPort(remoteAddr)
 	if err != nil {
@@ -35,34 +37,64 @@ func (self *Node) UpdateFromAddr(remoteAddr string) {
 	}
 }
 
-func registerToMaster(ip, port string) {
+func (self *Node) registerToMaster(ip, port string) {
 	route := fmt.Sprintf("http://%s:%s%s", ip, port, "/cluster/nodes")
-	node := Node{
-		Name: viper.GetString("node.name"),
-		Port: viper.GetString("node.port"),
-	}
-	jsonBytes, _ := json.Marshal(node)
+	jsonBytes, _ := json.Marshal(*self)
 	req, err := http.NewRequest("POST", route, bytes.NewBuffer(jsonBytes))
-	req.Header.Set("X-Custom-Header", "myvalue")
 	req.Header.Set("Content-Type", "application/json")
-	req.Close = true
-	client := &http.Client{}
+	client := &http.Client{Timeout: time.Duration(5 * time.Second)}
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
-	// we have to read all the body to close the connection .. if not it blocks ..
+	node := Node{}
+	err = json.NewDecoder(resp.Body).Decode(&node)
+	resp.Body.Close()
+	if err != nil {
+		log.Println("Register to Master :", err)
+	}
+	GetCluster().Nodes.Me().IP = node.IP
+	GetCluster().Nodes.Add(Node{
+		IP:     ip,
+		Port:   port,
+		Status: STATUS_ACTIVE,
+		Myself: false,
+	})
+	// io.Copy(ioutil.Discard, resp.Body)
+}
+
+func (self *Node) ping() {
+	route := fmt.Sprintf("http://%s:%s%s", self.IP, self.Port, "/healthcheck")
+	req, err := http.NewRequest("GET", route, nil)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{Timeout: time.Duration(5 * time.Second)}
+	resp, err := client.Do(req)
+	self.Status = STATUS_ACTIVE
+	if err != nil {
+		self.Status = STATUS_INACTIVE
+		return
+	}
 	io.Copy(ioutil.Discard, resp.Body)
 	resp.Body.Close()
 }
 
 func (self *Node) Start() {
+	log.Println("Node routines here !")
 	// if slave config then contact master to register as cluster node
 	if viper.IsSet("cluster.master") {
-		registerToMaster(viper.GetString("cluster.master.ip"), viper.GetString("cluster.master.port"))
+		log.Println("Apparently I'm a slave, I've to register to the known master")
+		self.registerToMaster(viper.GetString("cluster.master.ip"), viper.GetString("cluster.master.port"))
 	}
+	log.Println("Entering infinite loop to deal with pinging other nodes !")
 	for {
-		time.Sleep(10 * time.Second)
+		for _, node := range GetCluster().Nodes {
+			if node.Myself == false {
+				log.Println("Trying to ping : ", node)
+				go node.ping()
+			}
+		}
+		log.Println("Now waiting for ", viper.GetDuration("cluster.ping.interval"), " seconds")
+		time.Sleep(viper.GetDuration("cluster.ping.interval"))
 	}
 }
 
@@ -85,4 +117,13 @@ func (self *Nodes) Exists(node Node) bool {
 		}
 	}
 	return false
+}
+
+func (self *Nodes) Me() *Node {
+	for _, currentNode := range *self {
+		if currentNode.Myself == true {
+			return &currentNode
+		}
+	}
+	return nil
 }
