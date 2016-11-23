@@ -47,5 +47,4 @@ func CloseBody(c *context.AppContext) {
 	for _, response := range c.Responses {
 		response.Body.Close()
 	}
-	c.Next()
 }

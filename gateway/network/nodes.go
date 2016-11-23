@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
+
+	log "github.com/Sirupsen/logrus"
+
 	"net/http"
 	"time"
 
@@ -28,12 +30,12 @@ func (self *Node) String() string {
 }
 
 func (self *Node) UpdateFromAddr(remoteAddr string) {
-	log.Println("Update node from remoteAddr : ", remoteAddr)
+	contextLogger := log.WithField("remote address", remoteAddr)
+	contextLogger.Debug("Update node with remote address.")
 	var err error
 	self.IP, self.Port, err = context.ExtractIpPort(remoteAddr)
 	if err != nil {
-		// maybe not panicking ?
-		panic("RemoteAddr doesn't seems valid ?! See by yourself : " + remoteAddr)
+		contextLogger.Error(err)
 	}
 }
 
@@ -45,13 +47,13 @@ func (self *Node) registerToMaster(ip, port string) {
 	client := &http.Client{Timeout: time.Duration(5 * time.Second)}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		log.WithField("ip:port", ip+":"+port).Fatal(err)
 	}
 	node := Node{}
 	err = json.NewDecoder(resp.Body).Decode(&node)
 	resp.Body.Close()
 	if err != nil {
-		log.Println("Register to Master :", err)
+		log.WithError(err).Fatal("Invalid json response from master.")
 	}
 	GetCluster().Nodes.Me().IP = node.IP
 	GetCluster().Nodes.Add(Node{
@@ -60,7 +62,6 @@ func (self *Node) registerToMaster(ip, port string) {
 		Status: STATUS_ACTIVE,
 		Myself: false,
 	})
-	// io.Copy(ioutil.Discard, resp.Body)
 }
 
 func (self *Node) ping() {
@@ -71,6 +72,7 @@ func (self *Node) ping() {
 	resp, err := client.Do(req)
 	self.Status = STATUS_ACTIVE
 	if err != nil {
+		log.WithField("node", self).Warn("Node seems unreachable, tagging it as inactive.")
 		self.Status = STATUS_INACTIVE
 		return
 	}
@@ -79,26 +81,21 @@ func (self *Node) ping() {
 }
 
 func (self *Node) Start() {
-	log.Println("Node routines here !")
-	// if slave config then contact master to register as cluster node
 	if viper.IsSet("cluster.master") {
-		log.Println("Apparently I'm a slave, I've to register to the known master")
+		log.WithField("master", viper.GetStringMap("cluster.master")).Debug("I'm a slave, initiating register call to master.")
 		self.registerToMaster(viper.GetString("cluster.master.ip"), viper.GetString("cluster.master.port"))
 	}
-	log.Println("Entering infinite loop to deal with pinging other nodes !")
+	log.Debug("Entering async infinite loop of pings")
 	for {
 		for _, node := range GetCluster().Nodes {
 			if node.Myself == false {
-				log.Println("Trying to ping : ", node)
+				log.WithField("node", node).Debug("Trying to ping.")
 				go node.ping()
 			}
 		}
-		log.Println("Now waiting for ", viper.GetDuration("cluster.ping.interval"), " seconds")
 		time.Sleep(viper.GetDuration("cluster.ping.interval"))
 	}
 }
-
-// DEFINITION OF NODES
 
 type Nodes []Node
 

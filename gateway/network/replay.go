@@ -5,6 +5,8 @@ import (
 	"sync"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/snickers54/microservices/gateway/context"
 )
 
@@ -19,6 +21,7 @@ func ReplayHTTP(c *context.AppContext, node interface{}, wg sync.WaitGroup) {
 	case Service:
 		c.Request.URL.Host = node.(Service).IP + ":" + node.(Service).Port
 	}
+	log.WithField("request", c.Request).Debug("Replaying request !")
 	response, err := client.Do(c.Request)
 	if err != nil {
 		return

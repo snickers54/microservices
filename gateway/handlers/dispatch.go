@@ -26,10 +26,10 @@ func dispatchToService(c *context.AppContext) {
 		endpoints = endpoints.FindByVersion(semver)
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(1)
 	endpoint := network.RoundRobin(endpoints)
 	c.Set("route", route)
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go network.ReplayHTTP(c, endpoint.Service, wg)
 	wg.Wait()
 }

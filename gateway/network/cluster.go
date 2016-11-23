@@ -3,6 +3,8 @@ package network
 import (
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/spf13/viper"
 )
 
@@ -24,16 +26,21 @@ func InitCluster() {
 	_cluster.Map = radixTree{_map}
 	_cluster.Services = Services{}
 	_cluster.Nodes = Nodes{}
-	node := Node{
+	_cluster.Name = "Singlette Gateway Cluster prototype"
+	node := createOwnNode()
+	go node.Start()
+	_cluster.Nodes.Add(node)
+	log.WithField("cluster", _cluster).Debug("Init cluster !")
+}
+
+func createOwnNode() Node {
+	return Node{
 		Name:   viper.GetString("node.name"),
 		Port:   viper.GetString("node.port"),
 		Status: STATUS_ACTIVE,
 		IP:     "localhost",
 		Myself: true,
 	}
-	go node.Start()
-	_cluster.Nodes.Add(node)
-	_cluster.Name = "Singlette Gateway Cluster prototype"
 }
 
 func GetCluster() *Cluster {

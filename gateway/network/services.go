@@ -1,6 +1,10 @@
 package network
 
-import "fmt"
+import (
+	"fmt"
+
+	log "github.com/Sirupsen/logrus"
+)
 
 type Service struct {
 	Name    string  `json:"name"`
@@ -25,6 +29,7 @@ func (self *Services) Add(service Service) bool {
 			return false
 		}
 	}
+	log.WithField("service", service.String()).Debug("Add service to list of services.")
 	*self = append(*self, &service)
 	return true
 }

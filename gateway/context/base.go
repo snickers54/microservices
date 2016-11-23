@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type Payload map[string]interface{}
@@ -14,16 +17,34 @@ type Payload map[string]interface{}
 type AppHandler func(*AppContext)
 type Responses []*http.Response
 type AppContext struct {
-	Writer              http.ResponseWriter
-	Request             *http.Request
-	HandlerInterruption bool
-	Keys                map[string]interface{}
-	Responses           Responses
-	Mutex               sync.Mutex
+	Writer       http.ResponseWriter
+	Request      *http.Request
+	Keys         map[string]interface{}
+	Responses    Responses
+	Mutex        sync.Mutex
+	IndexHandler int
+	Handlers     []AppHandler
 }
 
-func (self *AppContext) Next() { self.HandlerInterruption = false }
-func (self *AppContext) Done() { self.HandlerInterruption = true }
+func (self *AppContext) Next() {
+	self.IndexHandler += 1
+	for {
+		if self.IndexHandler < 0 || self.IndexHandler >= len(self.Handlers) {
+			break
+		}
+		self.Handlers[self.IndexHandler](self)
+		self.IndexHandler += 1
+	}
+}
+func (self *AppContext) Done() { self.IndexHandler = -100 }
+
+func HandlerLogic(router *mux.Router, route string, handlers ...AppHandler) *mux.Route {
+	return router.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+		ctx := AppContext{Writer: w, Request: r, IndexHandler: -1, Handlers: handlers}
+		ctx.Set("route_time", time.Now())
+		ctx.Next()
+	})
+}
 
 func (self *AppContext) WriteJSON(value interface{}) {
 	result, err := json.Marshal(value)
@@ -75,13 +96,6 @@ func (c *AppContext) Get(key string) (value interface{}, exists bool) {
 		value, exists = c.Keys[key]
 	}
 	return
-}
-
-func (c *AppContext) MustGet(key string) interface{} {
-	if value, exists := c.Get(key); exists {
-		return value
-	}
-	panic("Key \"" + key + "\" does not exist")
 }
 
 func ExtractIpPort(value string) (ip string, port string, err error) {

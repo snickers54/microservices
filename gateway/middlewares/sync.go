@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"log"
 	"strings"
 	"sync"
 
@@ -19,7 +18,6 @@ func Sync(c *context.AppContext) {
 		gatewaysToReplay = gatewaysNotFoundInNotified(notified, nodes)
 	}
 	gatewaysToReplay = excludeMyself(gatewaysToReplay)
-	log.Println(gatewaysToReplay)
 	for _, node := range gatewaysToReplay {
 		notified = notified + "," + node.IP + ":" + node.Port
 	}
@@ -30,7 +28,6 @@ func Sync(c *context.AppContext) {
 		go network.ReplayHTTP(c, node, wg)
 	}
 	wg.Wait()
-	c.Next()
 }
 
 func excludeMyself(gateways network.Nodes) network.Nodes {

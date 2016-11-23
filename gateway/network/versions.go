@@ -2,10 +2,11 @@ package network
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type Version struct {
@@ -20,7 +21,6 @@ func (self *Version) String() string {
 }
 
 func (self *Version) Parse(str string) {
-	log.Println("Parsing version : ", str)
 	re := regexp.MustCompile("(?P<Major>[0-9]+).(?P<Minor>[0-9]+).(?P<Patch>[0-9]+)")
 	pureString := re.FindString(str)
 	list := strings.Split(pureString, ".")
@@ -30,7 +30,7 @@ func (self *Version) Parse(str string) {
 		self.Patch, _ = strconv.ParseUint(list[2], 10, 64)
 	}
 	self.Name = strings.Replace(str, " ("+pureString+")", "", -1)
-	log.Println("Result : ", self)
+	log.WithField("string", str).Debug("Result of parsing semantic versionning : ", self)
 }
 
 func (self *Version) Match(semver Version) bool {
