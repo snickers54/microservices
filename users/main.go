@@ -44,7 +44,7 @@ func main() {
 	}
 	route := models.Route{}
 	addr = fmt.Sprintf("%s://%s/routes", viper.GetString("gateway.protocol"), viper.GetString("gateway.addr"))
-	route.Register("/ping", addr, service)
+	route.Register("/ping", addr, &service)
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

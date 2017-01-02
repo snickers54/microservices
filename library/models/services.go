@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -12,7 +11,7 @@ import (
 )
 
 type Service struct {
-	ID      string  `json:"id"`
+	ID      string  `json:"id,omitempty"`
 	Name    string  `json:"name"`
 	IP      string  `json:"ip"`
 	Port    string  `json:"port"`
@@ -35,17 +34,15 @@ func (self *Services) Add(service Service) bool {
 			return false
 		}
 	}
-	service.ID = bson.NewObjectIdWithTime(time.Now()).String()
+	service.ID = bson.NewObjectIdWithTime(time.Now()).Hex()
 	log.WithField("service", service.String()).Debug("Add service to list of services.")
 	*self = append(*self, &service)
 	return true
 }
 
 func (self *Service) Register(URL string) []error {
-	_, body, errs := gorequest.New().Post(URL).Send(*self).End()
-	err := json.Unmarshal([]byte(body), self)
-	if err != nil {
-		errs = append(errs, err)
-	}
+	req, body, errs := gorequest.New().Post(URL).EndStruct(self)
+	log.WithField("body", string(body)).Info("body of request.")
+	log.WithField("request", req).Info("request")
 	return errs
 }

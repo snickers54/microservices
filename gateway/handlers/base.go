@@ -11,30 +11,30 @@ import (
 )
 
 func statsHandlers(router *mux.Router) {
-	subRouter := NewGSubRouter(router.PathPrefix("/stats").Subrouter())
-	subRouter.GET("/", statsSummarize)
+	subRouter := NewGSubRouter(router)
+	subRouter.GET("/stats", statsSummarize)
 }
 
 func clusterHandlers(router *mux.Router) {
-	subRouter := NewGSubRouter(router.PathPrefix("/cluster").Subrouter())
-	subRouter.GET("/", clusterDescribe)
-	subRouter.POST("/nodes", middlewares.Sync, middlewares.CloseBody, clusterRegister)
+	subRouter := NewGSubRouter(router)
+	subRouter.GET("/cluster", clusterDescribe)
+	subRouter.POST("/cluster/nodes", middlewares.Sync, middlewares.CloseBody, clusterRegister)
 }
 
 func servicesHandlers(router *mux.Router) {
-	subRouter := NewGSubRouter(router.PathPrefix("/services").Subrouter())
-	subRouter.GET("/", servicesDescribe)
-	subRouter.POST("/", servicesRegister, middlewares.Sync, middlewares.CloseBody)
+	subRouter := NewGSubRouter(router)
+	subRouter.GET("/services", servicesDescribe)
+	subRouter.POST("/services", servicesRegister, middlewares.Sync, middlewares.CloseBody)
 }
 
 func routesHandlers(router *mux.Router) {
-	subRouter := NewGSubRouter(router.PathPrefix("/routes").Subrouter())
-	subRouter.POST("/", routeRegister)
+	subRouter := NewGSubRouter(router)
+	subRouter.POST("/routes", routeRegister)
 }
 
 func dispatchHandlers(router *mux.Router) {
-	subRouter := NewGSubRouter(router.PathPrefix("/api").Subrouter())
-	patternDispatch := "/{path:.*}"
+	subRouter := NewGSubRouter(router)
+	patternDispatch := "/api/{path:.*}"
 	replayMiddlewares := []context.AppHandler{
 		dispatchToService,
 		middlewares.WriteReplay,
@@ -48,13 +48,14 @@ func dispatchHandlers(router *mux.Router) {
 }
 
 func baseHandlers(router *mux.Router) {
-	subRouter := NewGSubRouter(router.PathPrefix("/").Subrouter())
+	subRouter := NewGSubRouter(router)
 	subRouter.GET("/healthcheck", nodePing)
 }
 
 func Start() {
 	router := mux.NewRouter()
-	router.StrictSlash(true)
+	router.StrictSlash(false)
+
 	baseHandlers(router)
 	statsHandlers(router)
 	clusterHandlers(router)
