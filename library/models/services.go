@@ -3,6 +3,9 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/parnurzeal/gorequest"
@@ -23,7 +26,7 @@ func (self Services) Swap(i, j int)      { self[i], self[j] = self[j], self[i] }
 func (self Services) Less(i, j int) bool { return self[i].Name < self[j].Name }
 
 func (self *Service) String() string {
-	return fmt.Sprintf("%s - %s | %s:%s", self.Name, self.Version.String(), self.IP, self.Port)
+	return fmt.Sprintf("#%s %s - %s | %s:%s", self.ID, self.Name, self.Version.String(), self.IP, self.Port)
 }
 
 func (self *Services) Add(service Service) bool {
@@ -32,6 +35,7 @@ func (self *Services) Add(service Service) bool {
 			return false
 		}
 	}
+	service.ID = bson.NewObjectIdWithTime(time.Now()).String()
 	log.WithField("service", service.String()).Debug("Add service to list of services.")
 	*self = append(*self, &service)
 	return true

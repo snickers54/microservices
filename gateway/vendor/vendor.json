@@ -27,6 +27,24 @@
 			"revisionTime": "2016-08-16T05:15:41Z"
 		},
 		{
+			"checksumSHA1": "z8Nkc6sZanYABfsgkjUfHGDq534=",
+			"path": "github.com/gin-gonic/gin",
+			"revision": "52fcc5dbf6e94df33ad313858fb94b713e9d1b4a",
+			"revisionTime": "2015-09-25T10:14:45Z"
+		},
+		{
+			"checksumSHA1": "g2zSqD3W+i4vQjDwuB4J4oRYbGc=",
+			"path": "github.com/gin-gonic/gin/binding",
+			"revision": "52fcc5dbf6e94df33ad313858fb94b713e9d1b4a",
+			"revisionTime": "2015-09-25T10:14:45Z"
+		},
+		{
+			"checksumSHA1": "/cPJSLLdEAWI/Mavbbe13RgSfP4=",
+			"path": "github.com/gin-gonic/gin/render",
+			"revision": "52fcc5dbf6e94df33ad313858fb94b713e9d1b4a",
+			"revisionTime": "2015-09-25T10:14:45Z"
+		},
+		{
 			"checksumSHA1": "iIUYZyoanCQQTUaWsu8b+iOSPt4=",
 			"path": "github.com/gorilla/context",
 			"revision": "1ea25387ff6f684839d82767c1733ff4d4d15d0a",
@@ -117,6 +135,18 @@
 			"revisionTime": "2016-03-20T20:54:47Z"
 		},
 		{
+			"checksumSHA1": "MmQYoOadcQ5goARLjCqlSTAT03Y=",
+			"path": "github.com/manucorporat/sse",
+			"revision": "fe6ea2c8e398672518ef204bf0fbd9af858d0e15",
+			"revisionTime": "2015-07-15T18:48:05Z"
+		},
+		{
+			"checksumSHA1": "t/DQYibGKPAy79nVjMa7WVJmmeI=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "3dac7b4f76f6e17fb39b768b89e3783d16e237fe",
+			"revisionTime": "2015-11-27T01:45:55Z"
+		},
+		{
 			"checksumSHA1": "KCJhN9Dx329wAN/SeL4CxeypPyk=",
 			"path": "github.com/mitchellh/mapstructure",
 			"revision": "d2dd0262208475919e1a362f675cfc0e7c10e905",
@@ -159,10 +189,10 @@
 			"revisionTime": "2016-07-21T23:14:53Z"
 		},
 		{
-			"checksumSHA1": "UIaIw+3fQI7p1AmgXFcbq9Hsh+g=",
+			"checksumSHA1": "V9L23pBmSJCEnI1q92NSg44lR98=",
 			"path": "github.com/snickers54/microservices/library/models",
-			"revision": "d752850d129d5685aff0c39eb55177222f53e755",
-			"revisionTime": "2017-01-02T15:54:06Z"
+			"revision": "1f255b545e4c666011e295fde88f6f27e215c124",
+			"revisionTime": "2017-01-02T23:06:29Z"
 		},
 		{
 			"checksumSHA1": "8bCW4QRvgOK8nso/1K5DjXFA7+s=",
@@ -237,6 +267,12 @@
 			"revisionTime": "2016-08-22T19:27:50Z"
 		},
 		{
+			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
+			"path": "golang.org/x/net/context",
+			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revisionTime": "2016-08-11T10:50:59Z"
+		},
+		{
 			"checksumSHA1": "6thYfOqbpn607QljSl+jOXbuqio=",
 			"path": "golang.org/x/net/publicsuffix",
 			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
@@ -259,6 +295,12 @@
 			"path": "golang.org/x/text/unicode/norm",
 			"revision": "09c7ea1fcb3345da09be5a32c9c52303acd1dc2c",
 			"revisionTime": "2016-08-31T07:43:24Z"
+		},
+		{
+			"checksumSHA1": "yncVm0ic4CMUZYfJf9nWRBw8h2Y=",
+			"path": "gopkg.in/bluesuncorp/validator.v5",
+			"revision": "98121ac23ff3d764f525d18d8de944d150e3c0fe",
+			"revisionTime": "2015-08-04T01:33:32Z"
 		},
 		{
 			"checksumSHA1": "JfVmsMwyeeepbdw4q4wpN07BuFg=",

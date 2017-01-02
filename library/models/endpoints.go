@@ -14,7 +14,7 @@ type Endpoints []*Endpoint
 
 func (self *Endpoints) Exists(service *Service) bool {
 	for _, instanceService := range *self {
-		if instanceService.Service.String() == service.String() {
+		if instanceService.Service.ID == service.ID {
 			return true
 		}
 	}
