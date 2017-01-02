@@ -11,7 +11,7 @@ import (
 )
 
 type Service struct {
-	ID      string  `json:"id,omitempty"`
+	ID      string  `json:"id"`
 	Name    string  `json:"name"`
 	IP      string  `json:"ip"`
 	Port    string  `json:"port"`
@@ -41,7 +41,7 @@ func (self *Services) Add(service Service) bool {
 }
 
 func (self *Service) Register(URL string) []error {
-	req, body, errs := gorequest.New().Post(URL).EndStruct(self)
+	req, body, errs := gorequest.New().Post(URL).Send(self).EndStruct(self)
 	log.WithField("body", string(body)).Info("body of request.")
 	log.WithField("request", req).Info("request")
 	return errs
