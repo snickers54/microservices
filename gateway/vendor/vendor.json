@@ -267,6 +267,12 @@
 			"revisionTime": "2016-04-12T13:37:56Z"
 		},
 		{
+			"checksumSHA1": "K/lQInTR+txzqW/I5/rDzEXDndw=",
+			"path": "gopkg.in/mgo.v2/bson",
+			"revision": "4d04138ffef2791c479c0c8bbffc30b34081b8d9",
+			"revisionTime": "2015-10-26T16:34:53Z"
+		},
+		{
 			"checksumSHA1": "+OgOXBoiQ+X+C2dsAeiOHwBIEH0=",
 			"path": "gopkg.in/yaml.v2",
 			"revision": "a83829b6f1293c91addabc89d0571c246397bbf4",
