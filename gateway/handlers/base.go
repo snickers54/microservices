@@ -12,19 +12,24 @@ import (
 
 func statsHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/stats").Subrouter())
-	subRouter.GET("", statsSummarize)
+	subRouter.GET("/", statsSummarize)
 }
 
 func clusterHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/cluster").Subrouter())
-	subRouter.GET("", clusterDescribe)
+	subRouter.GET("/", clusterDescribe)
 	subRouter.POST("/nodes", middlewares.Sync, middlewares.CloseBody, clusterRegister)
 }
 
 func servicesHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/services").Subrouter())
-	subRouter.GET("", servicesDescribe)
-	subRouter.POST("", servicesRegister, middlewares.Sync, middlewares.CloseBody)
+	subRouter.GET("/", servicesDescribe)
+	subRouter.POST("/", servicesRegister, middlewares.Sync, middlewares.CloseBody)
+}
+
+func routesHandlers(router *mux.Router) {
+	subRouter := NewGSubRouter(router.PathPrefix("/routes").Subrouter())
+	subRouter.POST("/", routeRegister)
 }
 
 func dispatchHandlers(router *mux.Router) {
@@ -49,10 +54,12 @@ func baseHandlers(router *mux.Router) {
 
 func Start() {
 	router := mux.NewRouter()
+	router.StrictSlash(true)
 	baseHandlers(router)
 	statsHandlers(router)
 	clusterHandlers(router)
 	servicesHandlers(router)
 	dispatchHandlers(router)
+	routesHandlers(router)
 	log.Fatal(http.ListenAndServe(":"+viper.GetString("node.port"), router))
 }

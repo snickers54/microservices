@@ -40,7 +40,7 @@ func GetRoute(path string) *models.Route {
 	return rawRoute.(*models.Route)
 }
 
-func InsertEndpoint(path string, service *models.Service) bool {
+func InsertRoute(path string, service *models.Service) bool {
 	_, ok := _map.Get(path)
 	if ok == false {
 		_map.Insert(path, new(models.Route))

@@ -3,6 +3,9 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/network"
@@ -19,6 +22,7 @@ func servicesRegister(c *context.AppContext) {
 		return
 	}
 	service.Status = models.STATUS_ACTIVE
+	service.ID = bson.NewObjectIdWithTime(time.Now()).String()
 	if ok := network.GetCluster().Services.Add(service); ok == false {
 		c.Error(errors.New("This service is already registered."), http.StatusConflict)
 		return

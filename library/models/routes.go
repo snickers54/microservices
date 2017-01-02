@@ -1,6 +1,11 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/parnurzeal/gorequest"
+)
 
 type Route struct {
 	Endpoints Endpoints  `json:"services"`
@@ -22,4 +27,12 @@ func (self *Route) GetValidEndpoints() Endpoints {
 		}
 	}
 	return endpoints
+}
+
+func (self *Route) Register(route, URL string, service *Service) []error {
+	_, _, errs := gorequest.New().Post(URL).Send(gin.H{
+		"route":   route,
+		"service": service,
+	}).End()
+	return errs
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -8,6 +9,7 @@ import (
 )
 
 type Service struct {
+	ID      string  `json:"id"`
 	Name    string  `json:"name"`
 	IP      string  `json:"ip"`
 	Port    string  `json:"port"`
@@ -36,6 +38,10 @@ func (self *Services) Add(service Service) bool {
 }
 
 func (self *Service) Register(URL string) []error {
-	_, _, errs := gorequest.New().Post(URL).Send(*self).End()
+	_, body, errs := gorequest.New().Post(URL).Send(*self).End()
+	err := json.Unmarshal([]byte(body), self)
+	if err != nil {
+		errs = append(errs, err)
+	}
 	return errs
 }
