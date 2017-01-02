@@ -7,6 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/snickers54/microservices/gateway/handlers"
 	"github.com/snickers54/microservices/gateway/network"
+	"github.com/snickers54/microservices/library/utils"
 )
 
 var usage = func() {
@@ -19,7 +20,7 @@ func main() {
 		log.WithField("args", os.Args).Fatal("Number of arguments invalid.")
 		usage()
 	}
-	InitConfig(os.Args[1])
+	utils.InitConfig(os.Args[1])
 	network.InitCluster()
 	handlers.Start()
 }

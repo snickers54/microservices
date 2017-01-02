@@ -1,0 +1,20 @@
+version: '2'
+services:
+    master:
+        build: ./
+        ports:
+            - "8000:8000"
+        expose:
+            - 8000
+        entrypoint: ./gateway config.yml
+    # slave1:
+    #     build: ./
+    #     ports:
+    #         - "8001:8001"
+    #     expose:
+    #         - 8001
+    #     depends_on:
+    #         - master
+    #     entrypoint: ./gateway config-slave.yml
+    #     links:
+    #         - master

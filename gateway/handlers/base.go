@@ -12,19 +12,19 @@ import (
 
 func statsHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/stats").Subrouter())
-	subRouter.GET("/", statsSummarize)
+	subRouter.GET("", statsSummarize)
 }
 
 func clusterHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/cluster").Subrouter())
-	subRouter.GET("/", clusterDescribe)
+	subRouter.GET("", clusterDescribe)
 	subRouter.POST("/nodes", middlewares.Sync, middlewares.CloseBody, clusterRegister)
 }
 
 func servicesHandlers(router *mux.Router) {
 	subRouter := NewGSubRouter(router.PathPrefix("/services").Subrouter())
-	subRouter.GET("/", servicesDescribe)
-	subRouter.POST("/", servicesRegister, middlewares.Sync, middlewares.CloseBody)
+	subRouter.GET("", servicesDescribe)
+	subRouter.POST("", servicesRegister, middlewares.Sync, middlewares.CloseBody)
 }
 
 func dispatchHandlers(router *mux.Router) {

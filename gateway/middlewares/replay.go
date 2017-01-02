@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/snickers54/microservices/gateway/context"
-	"github.com/snickers54/microservices/gateway/network"
+	"github.com/snickers54/microservices/library/models"
 )
 
 func travelling_average(average time.Duration, startingTime time.Time, count uint) time.Duration {
@@ -21,13 +21,13 @@ func StatsReplay(c *context.AppContext) {
 	if ok == false {
 		return
 	}
-	route := rawRoute.(*network.Route)
-	route.Stats.Calls += 1
+	route := rawRoute.(*models.Route)
+	route.Stats.Calls++
 	route.Stats.AverageTime = travelling_average(route.Stats.AverageTime, startingTime, route.Stats.SuccessfulCalls)
 	if len(c.Responses) <= 0 {
-		route.Stats.FailedCalls += 1
+		route.Stats.FailedCalls++
 	} else {
-		route.Stats.SuccessfulCalls += 1
+		route.Stats.SuccessfulCalls++
 	}
 }
 

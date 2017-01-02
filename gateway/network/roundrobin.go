@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"sync"
 	"time"
+
+	"github.com/snickers54/microservices/library/models"
 )
 
 type cachedEndpointRR struct {
@@ -42,7 +44,7 @@ func init() {
 	}()
 }
 
-func createEntry(endpoints Endpoints) cachedEndpointRR {
+func createEntry(endpoints models.Endpoints) cachedEndpointRR {
 	csRR := cachedEndpointRR{
 		LastUsed:     time.Now(),
 		CurrentIndex: 0,
@@ -51,7 +53,7 @@ func createEntry(endpoints Endpoints) cachedEndpointRR {
 	return csRR
 }
 
-func createHash(endpoints Endpoints) string {
+func createHash(endpoints models.Endpoints) string {
 	aggregate := ""
 	for _, endpoint := range endpoints {
 		aggregate += endpoint.Service.String()
@@ -61,7 +63,7 @@ func createHash(endpoints Endpoints) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func RoundRobin(endpoints Endpoints) *Endpoint {
+func RoundRobin(endpoints models.Endpoints) *models.Endpoint {
 	cacheMutex.Lock()
 	hash := createHash(endpoints)
 	var index uint

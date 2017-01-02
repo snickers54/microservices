@@ -1,10 +1,10 @@
 node:
-  name: "Legend"
+  name: "Legend-slave"
   port: 8001
 cluster:
   ping:
     interval: "10s"
   name: "alpha"
   master:
-    ip: "127.0.0.1"
+    ip: master
     port: 8000

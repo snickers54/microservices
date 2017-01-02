@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
-
+	"github.com/snickers54/microservices/library/models"
 	"github.com/spf13/viper"
 )
 
 type Cluster struct {
-	Nodes    Nodes     `json:"nodes"`
-	Services Services  `json:"services"`
-	Map      radixTree `json:"map"`
-	Name     string    `json:"name"`
+	Nodes    Nodes           `json:"nodes"`
+	Services models.Services `json:"services"`
+	Map      radixTree       `json:"map"`
+	Name     string          `json:"name"`
 }
 
 func (self *Cluster) String() string {
@@ -24,7 +24,7 @@ var _cluster *Cluster
 func InitCluster() {
 	_cluster = new(Cluster)
 	_cluster.Map = radixTree{_map}
-	_cluster.Services = Services{}
+	_cluster.Services = models.Services{}
 	_cluster.Nodes = Nodes{}
 	_cluster.Name = "Singlette Gateway Cluster prototype"
 	node := createOwnNode()
@@ -37,7 +37,7 @@ func createOwnNode() Node {
 	return Node{
 		Name:   viper.GetString("node.name"),
 		Port:   viper.GetString("node.port"),
-		Status: STATUS_ACTIVE,
+		Status: models.STATUS_ACTIVE,
 		IP:     "localhost",
 		Myself: true,
 	}

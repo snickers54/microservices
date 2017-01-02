@@ -6,6 +6,7 @@ import (
 
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/network"
+	"github.com/snickers54/microservices/library/models"
 )
 
 func servicesDescribe(c *context.AppContext) {
@@ -13,13 +14,13 @@ func servicesDescribe(c *context.AppContext) {
 }
 
 func servicesRegister(c *context.AppContext) {
-	service := network.Service{}
+	service := models.Service{}
 	if ok := c.BindJSON(&service); !ok {
 		return
 	}
-	service.Status = network.STATUS_ACTIVE
+	service.Status = models.STATUS_ACTIVE
 	if ok := network.GetCluster().Services.Add(service); ok == false {
-		c.Error(errors.New("This node already exists."), http.StatusConflict)
+		c.Error(errors.New("This service is already registered."), http.StatusConflict)
 		return
 	}
 	c.WriteJSON(service)

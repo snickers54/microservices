@@ -7,6 +7,7 @@ import (
 
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/network"
+	"github.com/snickers54/microservices/library/models"
 )
 
 func clusterDescribe(c *context.AppContext) {
@@ -18,7 +19,7 @@ func clusterRegister(c *context.AppContext) {
 	if ok := c.BindJSON(&node); !ok {
 		return
 	}
-	node.Status = network.STATUS_ACTIVE
+	node.Status = models.STATUS_ACTIVE
 	node.IP = strings.Split(c.Request.RemoteAddr, ":")[0]
 	if ok := network.GetCluster().Nodes.Add(node); ok == false {
 		c.Error(errors.New("This node already exists."), http.StatusConflict)

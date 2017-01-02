@@ -1,0 +1,10 @@
+gateway:
+    addr: 127.0.0.1:8000
+    protocol: http
+service:
+    name: users
+    version:
+        name: alpha
+        major: 1
+        minor: 0
+        patch: 0

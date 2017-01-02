@@ -25,7 +25,7 @@ func Sync(c *context.AppContext) {
 	var wg sync.WaitGroup
 	wg.Add(len(gatewaysToReplay))
 	for _, node := range gatewaysToReplay {
-		go network.ReplayHTTP(c, node, wg)
+		go network.ReplayHTTP(c, node, &wg)
 	}
 	wg.Wait()
 }

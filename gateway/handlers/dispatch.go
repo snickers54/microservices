@@ -7,6 +7,7 @@ import (
 
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/network"
+	"github.com/snickers54/microservices/library/models"
 )
 
 func dispatchToService(c *context.AppContext) {
@@ -21,7 +22,7 @@ func dispatchToService(c *context.AppContext) {
 	endpoints := route.GetValidEndpoints()
 	// We filter by version if the header exists
 	if exists == true {
-		semver := network.Version{}
+		semver := models.Version{}
 		semver.Parse(headerVersion.(string))
 		endpoints = endpoints.FindByVersion(semver)
 	}
@@ -30,6 +31,6 @@ func dispatchToService(c *context.AppContext) {
 	c.Set("route", route)
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go network.ReplayHTTP(c, endpoint.Service, wg)
+	go network.ReplayHTTP(c, endpoint.Service, &wg)
 	wg.Wait()
 }

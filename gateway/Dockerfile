@@ -18,7 +18,6 @@ RUN mkdir -p /go/src/github.com/snickers54/microservices/gateway
 ADD . /go/src/github.com/snickers54/microservices/gateway/
 
 WORKDIR /go/src/github.com/snickers54/microservices/gateway
-RUN go get && go build -o gateway && cp ./gateway / && rm -rf $GOPATH/pkg/* $GOPATH/src/*
-WORKDIR /
+RUN go get && go build -o gateway
 CMD ./gateway ./config.yaml
 ENTRYPOINT ["./gateway"]

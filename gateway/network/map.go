@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	log "github.com/Sirupsen/logrus"
-
-	"github.com/armon/go-radix"
+	radix "github.com/armon/go-radix"
+	"github.com/snickers54/microservices/library/models"
 )
 
 var _map *radix.Tree
@@ -17,9 +17,9 @@ func (self *radixTree) MarshalJSON() ([]byte, error) { return json.Marshal(self.
 func Len() int                                       { return _map.Len() }
 func ToMap() map[string]interface{}                  { return _map.ToMap() }
 
-func RemoveInstance(service *Service) {
+func RemoveInstance(service *models.Service) {
 	_map.Walk(func(s string, v interface{}) bool {
-		currentRoute := v.(*Route)
+		currentRoute := v.(*models.Route)
 		for key, instance := range currentRoute.Endpoints {
 			if instance.Service.String() == service.String() {
 				log.WithField("service", service.String()).Debug("Removing a service from radix tree.")
@@ -32,32 +32,31 @@ func RemoveInstance(service *Service) {
 	})
 }
 
-func GetRoute(path string) *Route {
+func GetRoute(path string) *models.Route {
 	rawRoute, ok := _map.Get(path)
 	if ok == false {
 		return nil
 	}
-	return rawRoute.(*Route)
+	return rawRoute.(*models.Route)
 }
 
-func InsertEndpoint(path string, service *Service) bool {
-
+func InsertEndpoint(path string, service *models.Service) bool {
 	_, ok := _map.Get(path)
 	if ok == false {
-		_map.Insert(path, new(Route))
+		_map.Insert(path, new(models.Route))
 	}
 	rawRoute, ok := _map.Get(path)
-	route := rawRoute.(*Route)
+	route := rawRoute.(*models.Route)
 	contextLogger := log.WithFields(log.Fields{"route": route, "from": service.String()})
 	if route.Endpoints.Exists(service) == false {
-		route.Endpoints = append(route.Endpoints, &Endpoint{
+		route.Endpoints = append(route.Endpoints, &models.Endpoint{
 			Service: service,
-			Status:  STATUS_ACTIVE,
+			Status:  models.STATUS_ACTIVE,
 			Retries: 0,
 		})
-		contextLogger.Debug("Route registered.")
+		contextLogger.Info("Route registered.")
 		return true
 	}
-	contextLogger.Debug("Route already exists.")
+	contextLogger.Info("Route already exists.")
 	return false
 }

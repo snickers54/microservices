@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/snickers54/microservices/gateway/context"
+	"github.com/snickers54/microservices/library/models"
 	"github.com/spf13/viper"
 )
 
@@ -59,7 +60,7 @@ func (self *Node) registerToMaster(ip, port string) {
 	GetCluster().Nodes.Add(Node{
 		IP:     ip,
 		Port:   port,
-		Status: STATUS_ACTIVE,
+		Status: models.STATUS_ACTIVE,
 		Myself: false,
 	})
 }
@@ -70,10 +71,10 @@ func (self *Node) ping() {
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{Timeout: time.Duration(5 * time.Second)}
 	resp, err := client.Do(req)
-	self.Status = STATUS_ACTIVE
+	self.Status = models.STATUS_ACTIVE
 	if err != nil {
 		log.WithField("node", self).Warn("Node seems unreachable, tagging it as inactive.")
-		self.Status = STATUS_INACTIVE
+		self.Status = models.STATUS_INACTIVE
 		return
 	}
 	io.Copy(ioutil.Discard, resp.Body)
