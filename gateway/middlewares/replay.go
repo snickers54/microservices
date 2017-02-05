@@ -1,8 +1,10 @@
 package middlewares
 
 import (
+	"io/ioutil"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/library/models"
 )
@@ -33,13 +35,18 @@ func StatsReplay(c *context.AppContext) {
 
 func WriteReplay(c *context.AppContext) {
 	// for now we consider only one ..
+	log.WithField("responses", c.Responses).Info("array of responses")
 	if len(c.Responses) <= 0 {
+		log.WithField("responses.length", 0).Warn("No responses from replay ?!")
 		return
 	}
 	response := c.Responses[0]
 	data := []byte{}
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		response.StatusCode = 500
+	}
 	c.Writer.WriteHeader(response.StatusCode)
-	response.Body.Read(data)
 	c.Writer.Write(data)
 }
 

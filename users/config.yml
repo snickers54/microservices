@@ -1,8 +1,9 @@
 gateway:
-    addr: 127.0.0.1:8000
+    addr: gateway:8000
     protocol: http
 service:
     name: users
+    port: 8080
     version:
         name: alpha
         major: 1

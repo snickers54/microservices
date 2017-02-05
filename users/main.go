@@ -47,9 +47,7 @@ func main() {
 	route.Register("/ping", addr, &service)
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+		c.JSON(200, gin.H{})
 	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run()
 }
