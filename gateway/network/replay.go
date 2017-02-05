@@ -2,6 +2,7 @@ package network
 
 import (
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -16,15 +17,22 @@ func ReplayHTTP(c *context.AppContext, node interface{}, wg *sync.WaitGroup) {
 	client := &http.Client{
 		Timeout: time.Duration(5 * time.Second),
 	}
+	newHost := ""
 	switch node.(type) {
 	case Node:
-		c.Request.URL.Host = node.(Node).IP + ":" + node.(Node).Port
+		newHost = "http://" + node.(Node).IP + ":" + node.(Node).Port
 	case models.Service:
-		c.Request.URL.Host = node.(models.Service).IP + ":" + node.(models.Service).Port
+		newHost = "http://" + node.(models.Service).IP + ":" + node.(models.Service).Port
 	}
+	u, errURL := url.Parse(newHost)
+	if errURL != nil {
+		log.WithError(errURL).Debug("Couldn't parse the newHost variable")
+	}
+	c.Request.URL = u
 	log.WithField("request", c.Request).Debug("Replaying request !")
 	response, err := client.Do(c.Request)
 	if err != nil {
+		log.WithError(err).WithField("Host", c.Request.URL.Host).Debug("Failed to replay to service.")
 		return
 	}
 	c.Responses = append(c.Responses, response)

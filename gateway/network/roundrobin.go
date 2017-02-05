@@ -15,7 +15,7 @@ type cachedEndpointRR struct {
 	CurrentIndex uint
 }
 
-var cache map[string]cachedEndpointRR
+var cache map[string]cachedEndpointRR = map[string]cachedEndpointRR{}
 var cacheMutex = &sync.Mutex{}
 
 func invalidateRRStates() {
