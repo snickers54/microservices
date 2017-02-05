@@ -14,10 +14,11 @@ RUN apt-get update && \
 ENV GOROOT="/usr/local/go/"
 ENV GOPATH="/go:$GOROOT"
 ENV PATH="$PATH:/go/bin:$GOROOT/bin"
+RUN go get -u github.com/kardianos/govendor
 RUN mkdir -p /go/src/github.com/snickers54/microservices/users
 ADD . /go/src/github.com/snickers54/microservices/users/
 
 WORKDIR /go/src/github.com/snickers54/microservices/users
-RUN go get && go build -o users
+RUN govendor sync && go build -o users
 CMD ./users ./config.yaml
 ENTRYPOINT ["./users"]

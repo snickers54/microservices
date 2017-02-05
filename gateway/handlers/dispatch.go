@@ -6,13 +6,16 @@ import (
 	"strings"
 	"sync"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/snickers54/microservices/gateway/context"
 	"github.com/snickers54/microservices/gateway/network"
 	"github.com/snickers54/microservices/library/models"
 )
 
 func dispatchToService(c *context.AppContext) {
-	headerVersion, exists := c.Get("μS-Version-Matching")
+	headerVersion := c.Request.Header.Get("Ms-Version-Matching")
+	log.WithFields(log.Fields{"version": headerVersion}).Info("Header found ?")
 	route := network.GetRoute(strings.Replace(c.Request.URL.String(), "/api", "", -1))
 	if route == nil {
 		c.Error(errors.New("This route doesn't exists, is your μservice registered to the gateway ?"), http.StatusNotFound)
@@ -22,12 +25,17 @@ func dispatchToService(c *context.AppContext) {
 	// we get from the endpoint all ACTIVE services
 	endpoints := route.GetValidEndpoints()
 	// We filter by version if the header exists
-	if exists == true {
+	if headerVersion != "" {
 		semver := models.Version{}
-		semver.Parse(headerVersion.(string))
+		semver.Parse(headerVersion)
 		endpoints = endpoints.FindByVersion(semver)
+		log.WithFields(log.Fields{"endpoints": endpoints, "version": semver}).Info("endpoints found for asked semantic versioning.")
 	}
-
+	if len(endpoints) == 0 {
+		c.Error(errors.New("No endpoint available for this configuration."), http.StatusNotFound)
+		c.Done()
+		return
+	}
 	endpoint := network.RoundRobin(endpoints)
 	c.Set("route", route)
 	var wg sync.WaitGroup
