@@ -11,9 +11,9 @@ import (
 
 type Version struct {
 	Name  string `json:"name"`
-	Major uint64 `json:"major"`
-	Minor uint64 `json:"minor"`
-	Patch uint64 `json:"patch"`
+	Major int64  `json:"major"`
+	Minor int64  `json:"minor"`
+	Patch int64  `json:"patch"`
 }
 
 func (self *Version) String() string {
@@ -21,18 +21,27 @@ func (self *Version) String() string {
 }
 
 func (self *Version) Parse(str string) {
-	re := regexp.MustCompile("(?P<Major>[0-9]+).(?P<Minor>[0-9]+).(?P<Patch>[0-9]+)")
+	re := regexp.MustCompile("(?P<Major>[0-9]+).(?P<Minor>[0-9|x]+).(?P<Patch>[0-9|x]+)")
 	pureString := re.FindString(str)
 	list := strings.Split(pureString, ".")
+	log.Info(list)
 	if len(list) >= 3 {
-		self.Major, _ = strconv.ParseUint(list[0], 10, 64)
-		self.Minor, _ = strconv.ParseUint(list[1], 10, 64)
-		self.Patch, _ = strconv.ParseUint(list[2], 10, 64)
+		self.Major, _ = strconv.ParseInt(list[0], 10, 64)
+		self.Minor, _ = strconv.ParseInt(list[1], 10, 64)
+		if list[1] == "x" {
+			self.Minor = -1
+		}
+		self.Patch, _ = strconv.ParseInt(list[2], 10, 64)
+		if list[2] == "x" {
+			self.Patch = -1
+		}
 	}
 	self.Name = strings.Replace(str, " ("+pureString+")", "", -1)
 	log.WithField("string", str).Debug("Result of parsing semantic versionning : ", self)
 }
 
 func (self *Version) Match(semver Version) bool {
-	return (self.Major == semver.Major && self.Minor == semver.Minor && self.Patch == semver.Patch)
+	minorTruth := self.Minor == semver.Minor || semver.Minor < 0 || self.Minor < 0
+	patchTruth := self.Patch == semver.Patch || semver.Patch < 0 || self.Patch < 0
+	return self.Major == semver.Major && minorTruth && patchTruth
 }

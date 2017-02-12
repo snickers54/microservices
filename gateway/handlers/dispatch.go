@@ -19,7 +19,6 @@ func dispatchToService(c *context.AppContext) {
 	route := network.GetRoute(strings.Replace(c.Request.URL.String(), "/api", "", -1))
 	if route == nil {
 		c.Error(errors.New("This route doesn't exists, is your μservice registered to the gateway ?"), http.StatusNotFound)
-		c.Done()
 		return
 	}
 	// we get from the endpoint all ACTIVE services
@@ -33,7 +32,6 @@ func dispatchToService(c *context.AppContext) {
 	}
 	if len(endpoints) == 0 {
 		c.Error(errors.New("No endpoint available for this configuration."), http.StatusNotFound)
-		c.Done()
 		return
 	}
 	endpoint := network.RoundRobin(endpoints)
