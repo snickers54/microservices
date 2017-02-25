@@ -29,7 +29,7 @@ func (self *Service) String() string {
 	return fmt.Sprintf("#%s %s - %s | %s:%s", self.ID, self.Name, self.Version.String(), self.IP, self.Port)
 }
 
-func (self *Services) Add(service Service) bool {
+func (self *Services) Add(service *Service) bool {
 	for _, currentService := range *self {
 		if currentService.IP == service.IP && currentService.Port == service.Port {
 			return false
@@ -37,7 +37,7 @@ func (self *Services) Add(service Service) bool {
 	}
 	service.ID = bson.NewObjectIdWithTime(time.Now()).Hex()
 	log.WithField("service", service.String()).Debug("Add service to list of services.")
-	*self = append(*self, &service)
+	*self = append(*self, service)
 	return true
 }
 

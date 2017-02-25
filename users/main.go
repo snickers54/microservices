@@ -23,9 +23,9 @@ func createService() models.Service {
 		Port: viper.GetString("service.port"),
 		Version: models.Version{
 			Name:  viper.GetString("service.version.name"),
-			Major: uint64(viper.GetInt64("service.version.major")),
-			Minor: uint64(viper.GetInt64("service.version.minor")),
-			Patch: uint64(viper.GetInt64("service.version.patch")),
+			Major: int64(viper.GetInt64("service.version.major")),
+			Minor: int64(viper.GetInt64("service.version.minor")),
+			Patch: int64(viper.GetInt64("service.version.patch")),
 		},
 	}
 }

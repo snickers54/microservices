@@ -21,7 +21,7 @@ func servicesRegister(c *context.AppContext) {
 	}
 	service.IP = strings.Split(c.Request.RemoteAddr, ":")[0]
 	service.Status = models.STATUS_ACTIVE
-	if ok := network.GetCluster().Services.Add(service); ok == false {
+	if ok := network.GetCluster().Services.Add(&service); ok == false {
 		c.Error(errors.New("This service is already registered."), http.StatusConflict)
 		return
 	}

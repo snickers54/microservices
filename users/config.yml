@@ -3,7 +3,7 @@ gateway:
     protocol: http
 service:
     name: users
-    port: 8080
+    port: 8081
     version:
         name: alpha
         major: 1
@@ -11,4 +11,4 @@ service:
         patch: 0
 database:
     host: 127.0.0.1
-    port: 32769
+    port: 32772
