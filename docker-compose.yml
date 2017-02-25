@@ -18,13 +18,19 @@ services:
         entrypoint: ./users config.yml
         links:
             - gateway
-            - mysql
-    mysql:
-      image: mysql:5.6.26
-      environment:
-       - MYSQL_ROOT_PASSWORD=root
-       - MYSQL_DATABASE=password
-      ports:
-        - "3306:3306"
-      expose:
-        - 3306
+            - rethinkdb
+    # mysql:
+    #   image: mysql:5.6.26
+    #   environment:
+    #    - MYSQL_ROOT_PASSWORD=root
+    #    - MYSQL_DATABASE=password
+    #   ports:
+    #     - "3306:3306"
+    #   expose:
+    #     - 3306
+    rethinkdb:
+        image: rethinkdb
+        ports:
+            - "8080"
+            - "28015"
+            - "29015"

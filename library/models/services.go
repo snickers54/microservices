@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -44,5 +45,12 @@ func (self *Service) Register(URL string) []error {
 	req, body, errs := gorequest.New().Post(URL).Send(self).EndStruct(self)
 	log.WithField("body", string(body)).Info("body of request.")
 	log.WithField("request", req).Info("request")
+	tmp := Service{}
+	err := json.Unmarshal(body, &tmp)
+	if err != nil {
+		errs = append(errs, err)
+	} else {
+		self.ID = tmp.ID
+	}
 	return errs
 }

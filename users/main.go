@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/snickers54/microservices/library/models"
 	"github.com/snickers54/microservices/library/utils"
+	dbmodels "github.com/snickers54/microservices/users/models"
 	"github.com/spf13/viper"
 )
 
@@ -46,8 +47,10 @@ func main() {
 	addr = fmt.Sprintf("%s://%s/routes", viper.GetString("gateway.protocol"), viper.GetString("gateway.addr"))
 	route.Register("/ping", addr, &service)
 	r := gin.Default()
+	dbmodels.Start()
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{})
+		user := dbmodels.User{}
+		c.JSON(200, user.GetUsers())
 	})
 	r.Run()
 }

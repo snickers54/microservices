@@ -267,6 +267,10 @@
 			"revisionTime": "2015-08-04T01:33:32Z"
 		},
 		{
+			"path": "gopkg.in/gorething/gorethink.v3",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "K/lQInTR+txzqW/I5/rDzEXDndw=",
 			"path": "gopkg.in/mgo.v2/bson",
 			"revision": "4d04138ffef2791c479c0c8bbffc30b34081b8d9",
