@@ -52,5 +52,5 @@ func main() {
 		user := dbmodels.User{}
 		c.JSON(200, user.GetUsers())
 	})
-	r.Run()
+	r.Run(":" + viper.GetString("service.port"))
 }

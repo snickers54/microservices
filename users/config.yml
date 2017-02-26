@@ -10,5 +10,5 @@ service:
         minor: 1
         patch: 0
 database:
-    host: 127.0.0.1
-    port: 32772
+    host: rethinkdb
+    port: 28015
